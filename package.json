@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "g": "^2.0.1",
+    "typescript": "^6.0.2"
+  },
+  "type": "module",
+  "scripts": {
+    "compile" : "tsc",
+    "start":"node app.js",
+    "startcompile": "tsc && node app.js"
+  }
+}

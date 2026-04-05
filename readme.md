@@ -1,1 +1,2 @@
-belajar typescript
+# Belajar Typescript
+Repo yang digunakan untuk belajar Typescript. Fokus pada [app.ts](app.ts) untuk mengedit semua perubahan. folder [dict](dist) dan [config](config) untuk membuat sebuah definisi sendiri. jadi dibaca dulu baru teruskan belajar. Semangat !!!! 
