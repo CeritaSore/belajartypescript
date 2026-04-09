@@ -56,4 +56,19 @@ function edit(id, newName, newAuthor) {
     console.log(response);
 }
 edit(1, "funiculi funicula", 'toshikazu');
+function destroy(id) {
+    let getSpesificData = mybook.find((book) => book.id === id);
+    if (!getSpesificData) {
+        console.log("data tidak ditemukan");
+        return;
+    }
+    const currentBooks = mybook.filter((book) => book.id !== id);
+    const response = {
+        pesan: "berhasil menghapus",
+        kode: 200,
+        data: currentBooks
+    };
+    console.log(response);
+}
+destroy(2);
 //# sourceMappingURL=app.js.map
