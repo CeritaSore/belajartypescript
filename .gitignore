@@ -5,3 +5,4 @@ package-lock.json
 *.d.ts.map
 *.js
 *.js.map
+/generated/prisma

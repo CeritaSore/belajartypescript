@@ -1,42 +1,118 @@
 import type { Request, Response } from "express";
-import { Books } from "../models/Books.js";
 import type { Apiresponses } from "../../interfaces/ApiresponsesInterface.js";
-
+import { prisma } from "../lib/prisma.js";
+import zodValidation from "zod"
 class BooksController {
-  index(request: Request, response: Response) {
-    const book = Books;
-    const responses: Apiresponses<typeof book> = {
-      message: "Success",
+  async index(request: Request, response: Response) {
+    const allbooks = await prisma.books.findMany()
+    const statusMessage = allbooks.length == 0 ? "Empty Data" : "Getting Data"
+    const responses: Apiresponses<typeof allbooks> = {
+      message: statusMessage,
       code: 200,
-      value: book,
-    };
-    response.json(responses);
+      value: allbooks
+    }
+    response.json(responses)
   }
-  show(request: Request, response: Response) {
-    const id = request.params.id;
-    const book = Books.find((book) => book.id === Number(id));
-    const responses: Apiresponses<typeof book> = {
-      message: "success",
-      code: 200,
-      value: book,
-    };
-    response.json(responses);
-  }
-  store(request: Request, response: Response) {
+  async store(request: Request, response: Response) {
     const { name, author } = request.body;
-    const newBook = {
-      id: Books.length + 1,
-      name,
-      author,
-    };
-    const data: Apiresponses<typeof newBook> = {
-      message: "data ditambahkan",
+    const validation = zodValidation.object({
+      name: zodValidation.string().min(1, "Field Name Required"),
+      author: zodValidation.string().min(1, " Field Author Required")
+    })
+    const validate = validation.safeParse(request.body);
+    if (!validate.success) {
+      const errorResponse: Apiresponses<any> = {
+        message: "error",
+        code: 400,
+        value: validate.error.format()
+      }
+      return response.json(errorResponse);
+    }
+    const newBook = await prisma.books.create({
+      data: {
+        name: name,
+        author: author
+      }
+    })
+    const responses: Apiresponses<typeof newBook> = {
+      message: "success",
       code: 201,
-      value: newBook,
-    };
-    response.json(data);
+      value: newBook
+    }
+    response.json(responses)
   }
-  update(request: Request, response: Response) {}
+  async show(request: Request, response: Response) {
+    const id = Number(request.params.id)
+    const getSpecificData = await prisma.books.findFirst({
+      where: {
+        id: id
+      }
+    })
+    const message = !getSpecificData ? "Empty Data" : "Get Data"
+    const responses: Apiresponses<typeof getSpecificData> = {
+      message: message,
+      code: 200,
+      value: getSpecificData
+    }
+    response.json(responses);
+  }
+  async update(request: Request, response: Response) {
+    const id = Number(request.params.id)
+    const { name, author } = request.body;
+    const getSpecificData = await prisma.books.findFirst({
+      where: {
+        id: id
+      }
+    })
+    if (!getSpecificData) {
+      const errorResponse: Apiresponses<any> = {
+        message: "Error",
+        code: 404,
+        value: "data is not found"
+      }
+      return response.json(errorResponse)
+    }
+    const updateBook = await prisma.books.update({
+      where: {
+        id: id
+      },
+      data: {
+        name: name,
+        author: author
+      }
+    })
+    const responses: Apiresponses<typeof updateBook> = {
+      message: "success",
+      code: 201,
+      value: updateBook
+    }
+    return response.json(responses)
+  }
+  async destroy(request: Request, response: Response) {
+    const id = Number(request.params.id)
+    const getSpecificData = await prisma.books.findFirst({
+      where: {
+        id: id
+      }
+    })
+    if (!getSpecificData) {
+      const errorResponse: Apiresponses<any> = {
+        message: "error",
+        code: 404,
+        value: "Data is not found"
+      }
+      return response.json(errorResponse)
+    }
+    const destroyData = await prisma.books.delete({
+      where: {
+        id: id
+      }
+    })
+    const responses: Apiresponses<any> = {
+      message: "success", code: 201, value: "data has been destroyed"
+    }
+    return response.status(200).json(responses)
+  }
 }
 const BookController = new BooksController();
 export default BookController;
