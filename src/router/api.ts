@@ -16,3 +16,7 @@ router.delete("/books/:id/delete", BookController.destroy);
 router.get("/users", UsersController.index);
 router.post("/users/create", UsersController.store);
 router.get("/users/:id", UsersController.show);
+router.patch("/users/:id/update", UsersController.update);
+router.delete("/users/:id/delete", UsersController.destroy);
+
+router.get("/borrow");
