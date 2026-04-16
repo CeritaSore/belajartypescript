@@ -13,18 +13,30 @@ datasource db {
 }
 
 model books {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   author     String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  borrows    borrows[]
 }
 
 model users {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  email      String   @unique
+  email      String    @unique
   password   String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  borrows    borrows[]
+}
+
+model borrows {
+  id         Int      @id @default(autoincrement())
+  user       users    @relation(fields: [user_id], references: [id])
+  user_id    Int
+  book       books    @relation(fields: [book_id], references: [id])
+  book_id    Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
